@@ -1,0 +1,51 @@
+version: '2.0'
+services:
+   host1:
+       container_name: host1
+       ports:
+       - 8080:8080
+       - 8180:8180
+       - 8545:8545
+       - 8546:8546
+       - 30303:30303 
+       image: parity/parity:v1.10.0
+       volumes:
+       - ./deployment/chain/spec.json:/parity/spec.json:ro
+       - ./deployment/chain/reserved_peers:/parity/reserved_peers:ro
+       - ./deployment/1/password:/parity/password:ro
+       - ./deployment/1/authority.toml:/parity/authority.toml:ro
+       - ./deployment/1/${NETWORK_NAME}:/parity/data/keys/${NETWORK_NAME}
+       - ./data/1:/parity/data
+       command: --chain /parity/spec.json --config /parity/authority.toml -d /parity/data --unlock 0x9b7b86fc70ba2ad53e98d5f8f852c3629f813c7a,0x00ea169ce7e0992960d3bde6f5d539c955316432 --password /parity/password  
+   host2:
+       container_name: host2 
+       image: parity/parity:v1.10.0
+       volumes:
+       - ./deployment/chain/spec.json:/parity/spec.json:ro
+       - ./deployment/chain/reserved_peers:/parity/reserved_peers:ro
+       - ./deployment/2/password:/parity/password:ro
+       - ./deployment/2/authority.toml:/parity/authority.toml:ro
+       - ./deployment/2/${NETWORK_NAME}:/parity/data/keys/${NETWORK_NAME}
+       - ./data/2:/parity/data
+       command: --chain /parity/spec.json --config /parity/authority.toml -d /parity/data --unlock 0x6d480772b57e91f1c4e1cc196df88896d27ed327 --password /parity/password 
+   host3:
+       container_name: host3 
+       image: parity/parity:v1.10.0
+       volumes:
+       - ./deployment/chain/spec.json:/parity/spec.json:ro
+       - ./deployment/chain/reserved_peers:/parity/reserved_peers:ro
+       - ./deployment/3/password:/parity/password:ro
+       - ./deployment/3/authority.toml:/parity/authority.toml:ro
+       - ./deployment/3/${NETWORK_NAME}:/parity/data/keys/${NETWORK_NAME}
+       - ./data/3:/parity/data
+       command: --chain /parity/spec.json --config /parity/authority.toml -d /parity/data --unlock 0x5d8b81d0fe11046bb0dc31507706a08c0e1d5e85 --password /parity/password  
+   monitor:
+      image: buythewhale/ethstats_monitor
+      volumes:
+      - ./monitor/app.json:/home/ethnetintel/eth-net-intelligence-api/app.json:ro
+   dashboard:
+      image: buythewhale/ethstats
+      volumes:
+      - ./dashboard/ws_secret.json:/eth-netstats/ws_secret.json:ro
+      ports:
+      - 3001:3000
